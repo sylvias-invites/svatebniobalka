@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Pozvánka</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #000000;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        /* Kontejner přes celou obrazovku */
+        .invitation-wrapper {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        /* 1. ÚVODNÍ PNG FOTKA OBÁLKY */
+        .envelope-photo {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Vyplní celou obrazovku mobilu */
+            z-index: 10;
+            transition: opacity 0.4s ease;
+        }
+
+        /* Nápověda dole na fotce: Klikni na obálku */
+        .tap-hint {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.45);
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            pointer-events: none;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: pulse 2s infinite;
+            transition: opacity 0.3s ease;
+            white-space: nowrap;
+        }
+
+        /* Jemný pulzující efekt pro upoutání pozornosti */
+        @keyframes pulse {
+            0%, 100% { 
+                transform: translateX(-50%) scale(1); 
+                opacity: 0.85; 
+            }
+            50% { 
+                transform: translateX(-50%) scale(1.05); 
+                opacity: 1; 
+            }
+        }
+
+        /* 2. VIDEO OTEVÍRÁNÍ OBÁLKY */
+        .envelope-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 5;
+        }
+
+        /* Třída pro skrytí prvků po kliknutí */
+        .hidden {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="invitation-wrapper" id="invitationContainer">
+        
+        <!-- Nápovědný text dole -->
+        <div class="tap-hint" id="tapHint">Klikni na obálku</div>
+
+        <!-- Statická fotka obálky (PNG) -->
+        <img src="obalka-foto.png" alt="Zavřená obálka" class="envelope-photo" id="envelopePhoto">
+
+        <!-- Video otevírání obálky -->
+        <video class="envelope-video" id="envelopeVideo" playsinline preload="auto" muted>
+            <source src="obalka-video.mp4" type="video/mp4">
+            Váš prohlížeč nepodporuje přehrávání videa.
+        </video>
+
+    </div>
+
+    <script>
+        const container = document.getElementById('invitationContainer');
+        const photo = document.getElementById('envelopePhoto');
+        const video = document.getElementById('envelopeVideo');
+        const hint = document.getElementById('tapHint');
+
+        let isPlaying = false;
+
+        // Přednačtení videa do paměti mobilu
+        window.addEventListener('load', () => {
+            video.load();
+        });
+
+        // Po kliknutí / klepnutí na displej nebo obálku
+        container.addEventListener('click', () => {
+            if (isPlaying) return; // Zamezí opakovanému spouštění
+            isPlaying = true;
+
+            // 1. Skryje textovou nápovědu
+            hint.classList.add('hidden');
+
+            // 2. Spustí video
+            video.play().then(() => {
+                // 3. Po spuštění videa skryje PNG obrázek
+                photo.classList.add('hidden');
+            }).catch(error => {
+                console.log("Přehrávání videa selhalo:", error);
+            });
+        });
+
+        // Událost po skončení videa
+        video.addEventListener('ended', () => {
+            console.log("Video otevírání obálky skončilo.");
+            // Zde můžete doplnit např. přechod na text pozvánky
+        });
+    </script>
+</body>
+</html>
